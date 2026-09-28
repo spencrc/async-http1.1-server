@@ -63,7 +63,14 @@ $(OUTPUT_DIR)/%.o: vendor/llhttp/%.c | $(OUTPUT_DIR)
 ################################################################
 
 SECCOMP_SOURCE = https://github.com/moby/profiles/blob/main/seccomp/default.json
+SECCOMP_FILE = docker/seccomp.json
 
-docker/seccomp.json:
+docker-run: $(SECCOMP_FILE) docker-image
+	docker run --security-opt seccomp=$(SECCOMP_FILE) -p 3123:3123 coring-http-server
+
+docker-image:
+	docker build . -t coring-http-server
+
+$(SECCOMP_FILE):
 	curl -L -o docker/seccomp.json https://raw.githubusercontent.com/moby/profiles/main/seccomp/default.json
 	python3 docker/seccomp.py
