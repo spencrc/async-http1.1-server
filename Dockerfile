@@ -1,11 +1,14 @@
-FROM debian:bookworm-slim
+FROM alpine:3.24.1
 
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
+RUN apk add --no-cache \
     clang \
     g++ \
     make \
-    liburing-dev
+    liburing-dev \
+    linux-headers
 
 WORKDIR /app
 COPY . .
+
+RUN make all -j
+ENTRYPOINT ["./bin/release/server"]
